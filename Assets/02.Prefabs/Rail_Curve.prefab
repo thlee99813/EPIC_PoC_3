@@ -307,6 +307,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailTile
   _railType: 1
+  _connectionA: 2
+  _connectionB: 1
 --- !u!1 &3505013998920063050
 GameObject:
   m_ObjectHideFlags: 0

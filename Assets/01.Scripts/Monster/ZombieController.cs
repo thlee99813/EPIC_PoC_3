@@ -8,6 +8,7 @@ public class ZombieController : MonoBehaviour
         Patrol,
         MoveToRail,
         WanderOnRail,
+        ChaseTrain,
         Dead
     }
 
@@ -19,6 +20,8 @@ public class ZombieController : MonoBehaviour
     private Vector3 _patrolTarget;
     private RailTile _targetRailTile;
     private Action<ZombieController> _onDead;
+    private float _nextAttackTime;
+
 
     public void Init(GameContext gameContext, Action<ZombieController> onDead)
     {
@@ -51,6 +54,9 @@ public class ZombieController : MonoBehaviour
             case ZombieState.WanderOnRail:
                 UpdateWanderOnRail();
                 break;
+            case ZombieState.ChaseTrain:
+                UpdateChaseTrain();
+                break;
         }
     }
 
@@ -65,12 +71,18 @@ public class ZombieController : MonoBehaviour
     }
     public void TickDetect()
     {
-        if (_state != ZombieState.Patrol)
+        if (_state == ZombieState.Dead || _state == ZombieState.ChaseTrain)
         {
             return;
         }
 
-        if (!IsTrainDetected())
+        if (_state == ZombieState.WanderOnRail && IsTrainChaseable())
+        {
+            _state = ZombieState.ChaseTrain;
+            return;
+        }
+
+        if (_state != ZombieState.Patrol)
         {
             return;
         }
@@ -88,10 +100,9 @@ public class ZombieController : MonoBehaviour
 
     private void UpdateMoveToRail()
     {
-        if (_targetRailTile == null)
+        if (!IsTargetRailValid())
         {
-            _state = ZombieState.Patrol;
-            SetRandomPatrolTarget();
+            ResetToPatrol();
             return;
         }
 
@@ -107,13 +118,23 @@ public class ZombieController : MonoBehaviour
         }
     }
 
+    private bool IsTargetRailValid()
+    {
+        return _targetRailTile != null;
+    }
+
+    private void ResetToPatrol()
+    {
+        _targetRailTile = null;
+        _state = ZombieState.Patrol;
+        SetRandomPatrolTarget();
+    }
 
     private void UpdateWanderOnRail()
     {
-        if (_targetRailTile == null)
+        if (!IsTargetRailValid())
         {
-            _state = ZombieState.Patrol;
-            SetRandomPatrolTarget();
+            ResetToPatrol();
             return;
         }
 
@@ -124,14 +145,43 @@ public class ZombieController : MonoBehaviour
             SetRailWanderTarget();
         }
     }
+    private void UpdateChaseTrain()
+    {
+        if (!IsTrainDetected())
+        {
+            SetRailWanderTarget();
+            _state = ZombieState.WanderOnRail;
+            return;
+        }
+
+        Vector3 targetPosition = _gameContext.Train.position;
+        targetPosition.y = transform.position.y;
+
+        MoveTo(targetPosition, _data.ChaseTrainSpeed);
+    }
 
     private void SetRailWanderTarget()
     {
+        if (!IsTargetRailValid())
+        {
+            ResetToPatrol();
+            return;
+        }
+
+        if (UnityEngine.Random.value <= _data.WanderRailChangeChance)
+        {
+            RailTile nextRailTile = _gameContext.RailTileMap.GetRandomTileInRadius(_targetRailTile.transform.position, _data.WanderRailChangeRadius);
+
+            if (nextRailTile != null)
+            {
+                _targetRailTile = nextRailTile;
+            }
+        }
+
         Vector2 randomCircle = UnityEngine.Random.insideUnitCircle * 1.5f;
         Vector3 railPosition = _targetRailTile.transform.position;
         _patrolTarget = new Vector3(railPosition.x + randomCircle.x, transform.position.y, railPosition.z + randomCircle.y);
     }
-
 
     private void MoveTo(Vector3 targetPosition, float speed)
     {
@@ -152,6 +202,11 @@ public class ZombieController : MonoBehaviour
         return Vector3.Distance(transform.position, _gameContext.Train.position) <= _data.DetectTrainRadius;
     }
 
+    private bool IsTrainChaseable()
+    {
+        return Vector3.Distance(transform.position, _gameContext.Train.position) <= _data.ChaseTrainRadius;
+    }
+
     private void SetRandomPatrolTarget()
     {
         Vector2 randomCircle = UnityEngine.Random.insideUnitCircle * 10f;
@@ -160,6 +215,16 @@ public class ZombieController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        HandleTrainContact(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        HandleTrainContact(other);
+    }
+
+    private void HandleTrainContact(Collider other)
+    {
         TrainController trainController = other.GetComponentInParent<TrainController>();
 
         if (trainController == null)
@@ -167,15 +232,32 @@ public class ZombieController : MonoBehaviour
             return;
         }
 
-        if (trainController.Speed >= _killTrainSpeed)
+        if (trainController.IsMoving && trainController.Speed >= _killTrainSpeed)
         {
             Die();
+            return;
         }
+
+        TryAttackTrain(other);
+    }
+
+    private void TryAttackTrain(Collider other)
+    {
+        if (Time.time < _nextAttackTime)
+        {
+            return;
+        }
+
+        TrainHealth trainHealth = other.GetComponentInParent<TrainHealth>();
+        trainHealth.TakeDamage(_data.AttackDamage);
+
+        _nextAttackTime = Time.time + _data.AttackInterval;
     }
 
     private void Die()
     {
         _state = ZombieState.Dead;
+        _gameContext.AetherWallet.Add(_data.AetherReward, AetherChangeReason.ZombieKill);
         _gameContext.ZombieTickSystem.Unregister(this);
         _onDead?.Invoke(this);
         Destroy(gameObject);

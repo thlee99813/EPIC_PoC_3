@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ZombieData
   _patrolSpeed: 1.5
   _moveToRailSpeed: 2.5
-  _detectTrainRadius: 12
-  _detectRailRadius: 30
+  _chaseTrainSpeed: 4
+  _detectTrainRadius: 8
+  _detectRailRadius: 15
   _arriveDistance: 0.2
+  _detectInterval: 0.2
+  _aetherReward: 1
+  _chaseTrainRadius: 5

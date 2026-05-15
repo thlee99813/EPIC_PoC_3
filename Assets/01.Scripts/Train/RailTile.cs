@@ -8,29 +8,60 @@ public class RailTile : MonoBehaviour
         Curve
     }
 
+    public enum RailConnection
+    {
+        North,
+        East,
+        South,
+        West
+    }
+
     [SerializeField] private RailType _railType;
+    [SerializeField] private RailConnection _connectionA;
+    [SerializeField] private RailConnection _connectionB;
 
     public RailType Type => _railType;
     public bool IsCurve => _railType == RailType.Curve;
 
-    public int GetTurnDirection(Vector3 trainDirection)
+    public bool TryGetExitDirection(Vector3 enterDirection, out Vector3 exitDirection)
     {
-        Vector3 localDirection = transform.InverseTransformDirection(trainDirection);
-        localDirection.y = 0f;
-        localDirection.Normalize();
+        Vector3 entrySide = -Flatten(enterDirection);
+        Vector3 connectionA = GetWorldConnectionDirection(_connectionA);
+        Vector3 connectionB = GetWorldConnectionDirection(_connectionB);
 
-        int turnDirection;
+        float dotA = Vector3.Dot(entrySide, connectionA);
+        float dotB = Vector3.Dot(entrySide, connectionB);
 
-        if (Mathf.Abs(localDirection.z) > Mathf.Abs(localDirection.x))
+        const float connectionThreshold = 0.9f;
+
+        if (dotA < connectionThreshold && dotB < connectionThreshold)
         {
-            turnDirection = localDirection.z > 0f ? 1 : -1;
-        }
-        else
-        {
-            turnDirection = localDirection.x > 0f ? 1 : -1;
+            Debug.LogError($"Invalid Rail Entry / Rail:{name}, Y:{transform.eulerAngles.y}, Enter:{enterDirection}, EntrySide:{entrySide}, A:{_connectionA}/{connectionA}, B:{_connectionB}/{connectionB}, DotA:{dotA}, DotB:{dotB}");
+            exitDirection = Vector3.zero;
+            return false;
         }
 
-        return turnDirection;
+        exitDirection = dotA > dotB ? connectionB : connectionA;
+        return true;
     }
 
+    private Vector3 GetWorldConnectionDirection(RailConnection connection)
+    {
+        Vector3 localDirection = connection switch
+        {
+            RailConnection.North => Vector3.forward,
+            RailConnection.East => Vector3.right,
+            RailConnection.South => Vector3.back,
+            RailConnection.West => Vector3.left,
+            _ => Vector3.forward
+        };
+
+        return Flatten(transform.TransformDirection(localDirection));
+    }
+
+    private Vector3 Flatten(Vector3 direction)
+    {
+        direction.y = 0f;
+        return direction.normalized;
+    }
 }

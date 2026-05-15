@@ -6,6 +6,8 @@ public class BuildInputController : MonoBehaviour
     [SerializeField] private RailBuildController _railBuildController;
     [SerializeField] private BuildModeUI _buildModeUI;
     [SerializeField] private RailTileMapSystem _railTileMapSystem;
+    [SerializeField] private GameStateController _gameStateController;
+
 
 
     private bool _isBuildEnabled;
@@ -17,6 +19,11 @@ public class BuildInputController : MonoBehaviour
 
     private void Update()
     {
+        if (_gameStateController.CurrentState == GameState.GameOver)
+        {
+            return;
+        }
+
         Keyboard keyboard = Keyboard.current;
         Mouse mouse = Mouse.current;
 
@@ -67,7 +74,8 @@ public class BuildInputController : MonoBehaviour
     {
         _isBuildEnabled = isEnabled;
         _railTileMapSystem.Refresh();
-        Time.timeScale = isEnabled ? 0f : 1f;
+
+        _gameStateController.SetState(isEnabled ? GameState.BuildMode : GameState.Playing);
 
         _railBuildController.SetBuildEnabled(isEnabled);
         _buildModeUI.SetVisible(isEnabled);
@@ -86,6 +94,9 @@ public class BuildInputController : MonoBehaviour
 
     private void OnDisable()
     {
-        Time.timeScale = 1f;
+        if (_isBuildEnabled && _gameStateController.CurrentState == GameState.BuildMode)
+        {
+            _gameStateController.SetState(GameState.Playing);
+        }
     }
 }

@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 public class RailBuildController : MonoBehaviour
 {
     [Header("Raycast")]
@@ -16,6 +16,9 @@ public class RailBuildController : MonoBehaviour
     [SerializeField] private GameObject _straightRailDeclinePreviewPrefab;
     [SerializeField] private GameObject _curveRailDeclinePreviewPrefab;
     [SerializeField] private GameObject _removePrefab;
+    [SerializeField] private RailTileMapSystem _railTileMap;
+    [SerializeField] private GameContext _gameContext;
+    [SerializeField] private RailBuildCostData _buildCostData;
 
     private BuildMode _currentMode = BuildMode.RemoveRail;
     private BuildTile _currentTile;
@@ -87,7 +90,19 @@ public class RailBuildController : MonoBehaviour
 
         if (_currentMode == BuildMode.RemoveRail)
         {
+            if (IsRemoveBlockedByTrain())
+            {
+                return;
+            }
+
+            if (_currentTile.TryGetRailTile(out RailTile railTile))
+            {
+                float refundAmount = _buildCostData.GetRefund(railTile.Type);
+                _gameContext.AetherWallet.Add(refundAmount, AetherChangeReason.RemoveRailRefund);
+            }
+
             _currentTile.DestroyRail();
+            StartCoroutine(RefreshRailMapNextFrame());
             DestroyPreview();
             return;
         }
@@ -96,13 +111,16 @@ public class RailBuildController : MonoBehaviour
         {
             return;
         }
+        float buildCost = _buildCostData.GetBuildCost(_currentMode);
+        if (!_gameContext.AetherWallet.TrySpend(buildCost, AetherChangeReason.BuildRail))
+        {
+            return;
+        }
 
         GameObject railPrefab = GetRailPrefab();
-        GameObject rail = Instantiate(railPrefab, _currentTile.BuildParent);
-        rail.transform.localPosition = Vector3.zero;
-        rail.transform.localRotation = Quaternion.Euler(0f, _previewYRotation, 0f);
-
+        GameObject rail = Instantiate(railPrefab, _currentTile.BuildPosition, Quaternion.Euler(0f, _previewYRotation, 0f), _currentTile.BuildParent);
         _currentTile.SetRail(rail);
+        _railTileMap.Refresh();
         DestroyPreview();
     }
 
@@ -133,16 +151,15 @@ public class RailBuildController : MonoBehaviour
         {
             DestroyPreview();
             _currentPreviewPrefab = previewPrefab;
-            _previewObject = Instantiate(previewPrefab, _currentTile.BuildParent);
-        }
+            _previewObject = Instantiate(previewPrefab, _currentTile.BuildPosition, Quaternion.Euler(0f, _previewYRotation, 0f), _currentTile.BuildParent);        }
 
         if (_previewObject.transform.parent != _currentTile.BuildParent)
         {
-            _previewObject.transform.SetParent(_currentTile.BuildParent, false);
+            _previewObject.transform.SetParent(_currentTile.BuildParent, true);
         }
 
-        _previewObject.transform.localPosition = Vector3.zero;
-        _previewObject.transform.localRotation = Quaternion.Euler(0f, _previewYRotation, 0f);
+        _previewObject.transform.position = _currentTile.BuildPosition;
+        _previewObject.transform.rotation = Quaternion.Euler(0f, _previewYRotation, 0f);
     }
 
     private GameObject GetRailPrefab()
@@ -174,4 +191,22 @@ public class RailBuildController : MonoBehaviour
         _previewObject = null;
         _currentPreviewPrefab = null;
     }
+    private bool IsRemoveBlockedByTrain()
+    {
+        RailTile railTile = _currentTile.GetComponentInChildren<RailTile>();
+
+        if (railTile == null)
+        {
+            return false;
+        }
+
+        return railTile == _gameContext.TrainController.CurrentTile;
+    }
+    private IEnumerator RefreshRailMapNextFrame()
+    {
+        yield return null;
+        _railTileMap.Refresh();
+    }
+
+
 }

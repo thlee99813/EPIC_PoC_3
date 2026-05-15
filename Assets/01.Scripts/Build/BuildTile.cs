@@ -24,6 +24,11 @@ public class BuildTile : MonoBehaviour
     {
         _builtRail = rail;
     }
+    public bool TryGetRailTile(out RailTile railTile)
+    {
+        railTile = _builtRail.GetComponent<RailTile>();
+        return railTile != null;
+    }
 
     public void DestroyRail()
     {
