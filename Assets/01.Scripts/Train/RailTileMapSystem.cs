@@ -28,6 +28,25 @@ public class RailTileMapSystem : MonoBehaviour
         position.y = worldPosition.y;
         return position;
     }
+    public RailTile GetNearestTile(Vector3 worldPosition, float maxDistance)
+    {
+        RailTile nearestTile = null;
+        float nearestSqrDistance = maxDistance * maxDistance;
+
+        foreach (RailTile railTile in _tiles.Values)
+        {
+            float sqrDistance = (railTile.transform.position - worldPosition).sqrMagnitude;
+
+            if (sqrDistance < nearestSqrDistance)
+            {
+                nearestSqrDistance = sqrDistance;
+                nearestTile = railTile;
+            }
+        }
+
+        return nearestTile;
+    }
+
 
     private Vector2Int WorldToGrid(Vector3 worldPosition)
     {

@@ -15,12 +15,17 @@ public class CameraController : MonoBehaviour
 
 
     [SerializeField] private Transform _cameraStartPos;
+
+    [SerializeField] private bool _mouseLock = false;
     private bool _isInitialized = false;
 
 
     private void OnEnable()
     {
-        Cursor.lockState = CursorLockMode.Confined;
+        if(_mouseLock)
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+        }
     }
 
     private void OnDisable()
@@ -55,7 +60,10 @@ public class CameraController : MonoBehaviour
         }
         else
         {
-            MoveByScreenEdge(mousePosition);
+            if(_mouseLock)
+            {
+                MoveByScreenEdge(mousePosition);
+            }
         }
 
         Zoom(mouse.scroll.ReadValue().y);

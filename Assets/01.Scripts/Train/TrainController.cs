@@ -4,6 +4,7 @@ using UnityEngine;
 public class TrainController : MonoBehaviour
 {
     [SerializeField] private RailTileMapSystem _railTileMap;
+    
     [SerializeField] private float _speed = 5f;
     [SerializeField] private float _turnDuration = 0.5f;
     [SerializeField] private Vector3 _startDirection = Vector3.forward;
@@ -12,6 +13,7 @@ public class TrainController : MonoBehaviour
     private Vector3 _currentDirection;
     private Tween _moveTween;
     private Tween _turnTween;
+    public float Speed => _speed;
 
     private void Start()
     {
