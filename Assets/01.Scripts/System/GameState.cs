@@ -4,5 +4,6 @@ public enum GameState
     BuildMode,
     Event,
     Paused,
-    GameOver
+    GameOver,
+    GameClear
 }

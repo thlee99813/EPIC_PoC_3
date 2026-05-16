@@ -57,10 +57,24 @@ public class BaseZoneInteractionController : MonoBehaviour
 
     private void OnDialogueClosed()
     {
-        _shopPanel.Open(_currentZone.ShopData, OnShopClosed);
+        switch (_currentZone.ResultType)
+        {
+            case BaseZoneResultType.Shop:
+                _shopPanel.Open(_currentZone.ShopData, OnZoneClosed);
+                break;
+
+            case BaseZoneResultType.GameClear:
+                _currentZone = null;
+                _gameStateController.GameClear();
+                break;
+
+            case BaseZoneResultType.None:
+                OnZoneClosed();
+                break;
+        }
     }
 
-    private void OnShopClosed()
+    private void OnZoneClosed()
     {
         _currentZone = null;
         _gameStateController.SetState(GameState.Playing);

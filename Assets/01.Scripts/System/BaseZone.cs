@@ -4,12 +4,13 @@ public class BaseZone : MonoBehaviour
 {
     [SerializeField] private float _interactionRadius = 8f;
     [SerializeField] private BaseZoneDialogueData _dialogueData;
+    [SerializeField] private BaseZoneResultType _resultType = BaseZoneResultType.Shop;
     [SerializeField] private BaseZoneShopData _shopData;
 
     public float InteractionRadius => _interactionRadius;
     public BaseZoneDialogueData DialogueData => _dialogueData;
+    public BaseZoneResultType ResultType => _resultType;
     public BaseZoneShopData ShopData => _shopData;
-
     public bool Contains(Vector3 worldPosition)
     {
         Vector3 offset = worldPosition - transform.position;

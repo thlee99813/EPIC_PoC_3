@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameStateController : MonoBehaviour
 {
     [SerializeField] private GameObject _panelGameEnd;
-
+    [SerializeField] private GameObject _panelGameClear;
     private GameState _currentState = GameState.Paused;
     public GameState CurrentState => _currentState;
     public event Action<GameState> Changed;
@@ -13,6 +13,7 @@ public class GameStateController : MonoBehaviour
     private void Start()
     {
         _panelGameEnd.SetActive(false);
+        _panelGameClear.SetActive(false);
         SetState(GameState.Playing);
     }
 
@@ -33,6 +34,11 @@ public class GameStateController : MonoBehaviour
         SetState(GameState.GameOver);
     }
 
+    public void GameClear()
+    {
+        SetState(GameState.GameClear);
+    }
+
     public void RestartScene()
     {
         Time.timeScale = 1f;
@@ -44,9 +50,10 @@ public class GameStateController : MonoBehaviour
         switch (state)
         {
             case GameState.Playing:
-                Time.timeScale = 1f;
-                _panelGameEnd.SetActive(false);
-                break;
+            Time.timeScale = 1f;
+            _panelGameEnd.SetActive(false);
+            _panelGameClear.SetActive(false);
+            break;
 
             case GameState.BuildMode:
                 Time.timeScale = 0f;
@@ -63,6 +70,10 @@ public class GameStateController : MonoBehaviour
             case GameState.GameOver:
                 Time.timeScale = 0f;
                 _panelGameEnd.SetActive(true);
+                break;
+            case GameState.GameClear:
+                Time.timeScale = 0f;
+                _panelGameClear.SetActive(true);
                 break;
         }
     }
