@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5668391d2c8b2704bbfe7234b6958f86, type: 3}
+  m_Name: Entry_Water1
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueEntryData
+  _speakerName: "\uD558\uC218\uD68C \uB300\uC7A5"
+  _characterSprite: {fileID: 0}
+  _dialogueBoxSprite: {fileID: 0}
+  _text: "\uC774\uACF3\uC740 \uC6B0\uB9AC\uC758 \uC601\uC5ED\uC774\uB2E4."

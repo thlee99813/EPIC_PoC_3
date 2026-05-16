@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 7168390841242707194}
   - component: {fileID: 2001904853595981099}
   - component: {fileID: 2491145442736647048}
+  - component: {fileID: -1034492153889003301}
   m_Layer: 6
   m_Name: Building_Visual
   m_TagString: Wall
@@ -204,6 +205,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-1034492153889003301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2440282242411056461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4344a089e545b3943bfee21fcc4145f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BaseZone
+  _interactionRadius: 8
+  _dialogueData: {fileID: 0}
 --- !u!1 &7861082347788180775
 GameObject:
   m_ObjectHideFlags: 0

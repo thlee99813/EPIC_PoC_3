@@ -4,5 +4,7 @@ public enum AetherChangeReason
     ZombieKill,
     BuildRail,
     RemoveRailRefund,
-    TrainMove
+    TrainMove,
+    BuyItem,
+    SellItem
 }

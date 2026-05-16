@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfc688b3e42be77418b373a651fdc791, type: 3}
+  m_Name: Zone_Water
+  m_EditorClassIdentifier: Assembly-CSharp::BaseZoneDialogueData
+  _zoneName: "\uC9C0\uD558\uC218\uB3C4\uC5F0\uD569"
+  _dialogueSequence: {fileID: 11400000, guid: 2162b5299bb6aca45a3e584a905bdf02, type: 2}

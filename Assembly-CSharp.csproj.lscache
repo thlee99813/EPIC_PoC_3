@@ -58,12 +58,24 @@ Assets/01.Scripts/Build/
  RailBuildController.cs
 Assets/01.Scripts/
  Camera/CameraController.cs
- Data/RailBuildCostData.cs
+ Data/Script/
+  BaseZoneDialogueData.cs
+  BaseZoneResultType.cs
+  BaseZoneShopData.cs
+  DialogueEntryData.cs
+  DialogueSequenceData.cs
+  RailBuildCostData.cs
  Frame/
   Debugger.cs
   OffsetDuplicator.cs
   Singleton.cs
   TextUtil.cs
+ Item/
+  BaseZoneShopPanel.cs
+  ItemInventory.cs
+  ItemType.cs
+  ShopItemRowView.cs
+  ShopItemTradeData.cs
  Manager/GameContext.cs
  Monster/
   ZombieController.cs
@@ -73,15 +85,22 @@ Assets/01.Scripts/
   AetherChangeReason.cs
   AetherTextView.cs
   AetherWallet.cs
+  BaseZone.cs
+  BaseZoneInteractionController.cs
   GameFlowController.cs
   GameState.cs
   GameStateController.cs
+  TrainRunButtonController.cs
   ZombieTickSystem.cs
+ TestDebug.cs
  Train/
   RailTile.cs
   RailTileMapSystem.cs
   TrainController.cs
   TrainHealth.cs
+ UI/
+  BaseZoneDialoguePanel.cs
+  TrainHealthTextView.cs
 Assets/TutorialInfo/Scripts/Readme.cs
 Temp/obj/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 

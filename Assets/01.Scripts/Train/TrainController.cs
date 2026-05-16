@@ -17,9 +17,11 @@ public class TrainController : MonoBehaviour
     private RailTile _currentTile;
     private Tween _moveTween;
     private Tween _turnTween;
+    private bool _isStopped;
 
     public float Speed => _speed;
     public bool IsMoving => _moveTween != null && _moveTween.IsActive() && _moveTween.IsPlaying();
+    public bool IsStopped => _isStopped;
     public RailTile CurrentTile => _currentTile;
 
     private void Start()
@@ -31,6 +33,10 @@ public class TrainController : MonoBehaviour
 
     private void MoveNextTile()
     {
+        if (_isStopped)
+        {
+            return;
+        }
         if (!_railTileMap.TryGetTile(_detectPoint.position, out RailTile currentTile))
         {
             _moveTween?.Kill();
@@ -101,7 +107,36 @@ public class TrainController : MonoBehaviour
 
         _moveTween = sequence;
     }
+    public void ToggleRun()
+    {
+        if (_isStopped)
+        {
+            Resume();
+            return;
+        }
 
+        Stop();
+    }
+
+    public void Stop()
+    {
+        _isStopped = true;
+        _moveTween?.Pause();
+        _turnTween?.Pause();
+    }
+
+    public void Resume()
+    {
+        _isStopped = false;
+
+        if (_moveTween != null && _moveTween.IsActive())
+        {
+            _moveTween.Play();
+            return;
+        }
+
+        MoveNextTile();
+    }
     private void ApplyRotation(Vector3 direction)
     {
         transform.rotation = Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(0f, _yawOffsetDegrees, 0f);
